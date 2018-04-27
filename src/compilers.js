@@ -21,11 +21,11 @@ var javaUserFilePath = '/src/main/java/Calculator.java';
 var rubyUserFilePath = '/my_model.rb';
 
 module.exports = [
-  ['javascript', jsPath,  jsCompile, jsUserFilePath, compileJS],
-  ['java', javaPath, javaCompile, javaUserFilePath, compileJava],
-  ['ruby', rubyPath, rubyCompile, rubyUserFilePath, compileRuby]
+  ['javascript', jsPath,  jsCompile, jsUserFilePath, 'node runtests.js'],
+  ['java', javaPath, javaCompile, javaUserFilePath, 'mvn test'],
+  ['ruby', rubyPath, rubyCompile, rubyUserFilePath, 'rpsec my_model_spec.rb --format j']
 ]
 
-var compileJS = 'mocha -json tests.js';
+var compileJS = 'node runtests.js';
 var compileJava = 'mvn test';
 var compileRuby = 'rpsec my_model_spec.rb --format j';

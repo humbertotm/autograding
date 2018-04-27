@@ -1,11 +1,11 @@
-// var Mocha = require('mocha');
-var Mocha = require('/usr/local/lib/node_modules/mocha');
+var Mocha = require('mocha');
+// var Mocha = require('/usr/local/lib/node_modules/mocha');
 
 var mocha = new Mocha({
   reporter: 'json'
 });
 
-var testFile = './usercode/tests.js';
+var testFile = './tests.js';
 
 // var testResults = {};
 

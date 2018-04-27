@@ -24,4 +24,15 @@ RUN apt-get update -qqy && apt-get -qqyy install \
   && rm -rf /var/lib/apt/lists/*
 # RUN apt-get install -y build-essential
 
-CMD ["/bin/bash"]
+WORKDIR /usr/src/autograding
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "src/app.js"]
+
+# CMD ["/bin/bash"]
