@@ -11,12 +11,13 @@ public class CalculatorTest {
     @Test
     public void testDataInfo() throws IOException {
         Calculator c = new Calculator();
-        assertEquals(10, c.sum(3,1));
+        assertEquals(4, c.sum(3,1));
     }
 
     @Test
     public void testDataInfo2() throws IOException {
         Calculator c = new Calculator();
+        assertEquals(5, c.sum(3,2));
     }
 
 }

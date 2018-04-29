@@ -1,4 +1,4 @@
-require_relative "../src/my_model"
+require_relative "./my_model"
 
 RSpec.describe MyModel do
  it "expect be true" do
