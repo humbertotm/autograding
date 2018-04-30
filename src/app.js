@@ -1,3 +1,4 @@
+var buildResJSON = require('./utils/buildResJSON.js');
 var compilersArr = require('./compilers.js');
 var path = require('path');
 
@@ -63,7 +64,8 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
       } else {
         console.log('stdOut: ' + stdOut);
         var parsedOutput = JSON.parse(stdOut);
-        res.status(200).json(parsedOutput);
+        var resJSON = buildResJSON(parsedOutput, langId);
+        res.status(200).json(resJSON);
       }
     });
   });
