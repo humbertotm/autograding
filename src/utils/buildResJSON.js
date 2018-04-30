@@ -1,41 +1,57 @@
-function extractTestResults(testsArr, outcome) {
+function extractJsTestResults(testsArr, outcome) {
   var testOutcome;
   (outcome === 'pass') ? testOutcome = true : testOutcome = false;
 
-  var outputJSON = {};
+  var newTestsArr = [];
   testsArr.forEach(function(test) {
     var testTitle = test['title'];
-    outputJSON[testTitle] = testOutcome;
+    var testObj = { [testTitle]: outcome }
+    newTestsArr.push(testObj);
+    // outputJSON[testTitle] = testOutcome;
   });
 
-  return outputJSON;
+  return newTestsArr;
 }
 
 function jsJsonResBuilder(stdOutJSON) {
   // These are arrays.
+  var resJSON = {
+    tests: []
+  }
   var passedTests = stdOutJSON.passes;
   var failedTests = stdOutJSON.failures;
 
-  var passObj = extractTestResults(passedTests, 'pass');
-  var failObj = extractTestResults(failedTests, 'fail');
+  var passArr = extractJsTestResults(passedTests, 'pass');
+  var failArr = extractJsTestResults(failedTests, 'fail');
 
-  var resJSON = Object.assign(passObj, failObj);
+  resJSON['tests'] = resJSON['tests'].concat(passArr, failArr);
   return resJSON;
 }
 
-function javaJsonResBuilder(resJSON) {
+function javaJsonResBuilder(stdOutJSON) {
   // var resJSON = {};
-  // return resJSON;
+  // // return resJSON;
+  // var testsArr = stdOutJSON['tests'];
+  // testsArr.forEach(function(test) {
+  //   Object.assign(resJSON, test);
+  // });
+
+  return stdOutJSON;
 }
 
 function rubyJsonResBuilder(stdOutJSON) {
-  var resJSON = {};
+  var resJSON = {
+    tests: []
+  };
   // return resJSON;
   var testsArr = stdOutJSON['examples'];
   testsArr.forEach(function(test) {
     var outcome = (test['status'] === 'passed') ? true : false;
     var testTitle = test['full_description'];
-    resJSON[testTitle] = outcome;
+    var testObj = {
+      [testTitle]: outcome
+    }
+    resJSON['tests'].push(testObj);
   });
 
   return resJSON;

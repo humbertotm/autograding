@@ -54,7 +54,7 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
       rimraf.sync(dest);
 
       if(err) {
-        console.log(err);
+        throw Error(err);
       } else if(stdErr) {
         console.log('stdErr: ' + stdErr);
         // What would be a more appropriate http status?
