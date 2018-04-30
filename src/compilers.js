@@ -1,6 +1,6 @@
-var jsUserFilePath = '/usercode.js';
-var javaUserFilePath = '/src/main/java/Calculator.java';
-var rubyUserFilePath = '/my_model.rb';
+var jsUserFilePath = '/';
+var javaUserFilePath = '/src/main/java/';
+var rubyUserFilePath = '/';
 
 module.exports = [
   ['javascript', jsUserFilePath, 'mocha tests.js --reporter json'],

@@ -38,8 +38,10 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
       throw Error(err);
     }
 
+    var fileName = req.file.originalname;
+    var filePath = compilersArr[langId][1];
     // Write codefile to temp dir
-    fs.writeFileSync(path.join(dest, compilersArr[langId][1]), req.file.buffer);
+    fs.writeFileSync(path.join(dest, filePath + fileName), req.file.buffer);
 
     // Get compiling command
     var compCommand = compilersArr[langId][2];
@@ -54,6 +56,7 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
         console.log(err);
       } else if(stdErr) {
         console.log('stdErr: ' + stdErr);
+        // What would be a more appropriate http status?
         return res.send(200).json({
           error: stdErr
         });
