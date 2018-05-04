@@ -27,7 +27,7 @@ app.use(bodyParser());
 app.post('/compile', upload.single('codefile'), function(req, res) {
   var langId = parseInt(req.body.langid);
   if(langId>=compilersArr.length){
-    return res.status(400).send({error:"Requested langid is out of range"});
+    return res.status(400).send({error:"langid requested is out of range"});
   }
   if(req.file==null){
     return res.status(400).send({error:"File not found in the request"});
@@ -54,7 +54,7 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
     var compCommand = compilersArr[langId][2];
     // Build statement to be executed
     var compSt = 'cd ' + dest + ' && ' + compCommand;
-
+    
     exec(compSt, function(err, stdOut, stdErr) {
       var parsedOutputparsedOutput;
       var resJSON;
@@ -70,22 +70,16 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
             error: stdErr
           });
         } else {
-          console.log('stdOut: ' + stdOut);
-          parsedOutput = JSON.parse(stdOut);
-          resJSON = buildResJSON(parsedOutput, langId);
-          res.status(200).json(resJSON);   
+            if(checkIfJSON(stdOut)){
+              parsedOutput = JSON.parse(stdOut);
+              resJSON = buildResJSON(parsedOutput, langId);
+              res.status(200).json(resJSON);   
+            }else res.status(400).json((stdOut.length==0)?"Your code cannot be tested, some methods not found":stdOut);  
         }
       }
       catch(e){
-        resJSON=stdOut;
-        // Check if the stdOut is not in JSON format to handle the Java's and JS's errors
-        if(checkIfJSON(stdOut)){
-          parsedOutput = JSON.parse(stdOut);
-          resJSON= buildResJSON(parsedOutput, langId);
-          return res.status(400).json({error: "Source file code error",message:resJSON});
-        }
         resJSON= buildWithNoJson(err.stack, langId);
-        return res.status(500).send(resJSON);
+        return res.status(400).send(resJSON);
       }
     });
   });
