@@ -19,7 +19,7 @@ var storage = multer.memoryStorage();
 var upload = multer({ storage: storage });
 
 var app = express();
-var port = 3000;
+var port = 4000;
 
 // app.use(express.static(__dirname));
 app.use(bodyParser());
@@ -31,12 +31,12 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
   }
   if(req.file==null){
     return res.status(400).send({error:"File not found in the request"});
-  } 
+  }
   var identifier = Math.floor(Math.random() * 1000000);
   var langFolder = compilersArr[langId][0];
   var dirToCopy = path.join(__dirname, './usercode/' + langFolder);
   var dest = path.join(__dirname, './code_to_compile/' + identifier);
-  
+
   // Create temp directory
   fs.mkdirSync(dest);
 
@@ -54,7 +54,7 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
     var compCommand = compilersArr[langId][2];
     // Build statement to be executed
     var compSt = 'cd ' + dest + ' && ' + compCommand;
-    
+
     exec(compSt, function(err, stdOut, stdErr) {
       var parsedOutputparsedOutput;
       var resJSON;
@@ -73,8 +73,8 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
             if(checkIfJSON(stdOut)){
               parsedOutput = JSON.parse(stdOut);
               resJSON = buildResJSON(parsedOutput, langId);
-              res.status(200).json(resJSON);   
-            }else res.status(400).json((stdOut.length==0)?"Your code cannot be tested, some methods not found":stdOut);  
+              res.status(200).json(resJSON);
+            }else res.status(400).json((stdOut.length==0)?"Your code cannot be tested, some methods not found":stdOut);
         }
       }
       catch(e){
