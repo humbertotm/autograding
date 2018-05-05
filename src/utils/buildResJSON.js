@@ -16,7 +16,8 @@ function extractJsTestResults(testsArr, outcome) {
 function jsJsonResBuilder(stdOutJSON) {
   // These are arrays.
   var resJSON = {
-    tests: []
+    tests: [],
+    messages:[]
   }
   var passedTests = stdOutJSON.passes;
   var failedTests = stdOutJSON.failures;
@@ -29,21 +30,16 @@ function jsJsonResBuilder(stdOutJSON) {
 }
 
 function javaJsonResBuilder(stdOutJSON) {
-  // var resJSON = {};
-  // // return resJSON;
-  // var testsArr = stdOutJSON['tests'];
-  // testsArr.forEach(function(test) {
-  //   Object.assign(resJSON, test);
-  // });
-
   return stdOutJSON;
 }
 
 function rubyJsonResBuilder(stdOutJSON) {
+  //Regex to replace the path of the file for server security
+  const regex = /home([^\d]*)(\d*)([^\w]*)/;
   var resJSON = {
-    tests: []
+    tests: [],
+    messages:[]
   };
-  // return resJSON;
   var testsArr = stdOutJSON['examples'];
   testsArr.forEach(function(test) {
     var outcome = (test['status'] === 'passed') ? true : false;
@@ -53,7 +49,17 @@ function rubyJsonResBuilder(stdOutJSON) {
     }
     resJSON['tests'].push(testObj);
   });
-
+  if(stdOutJSON['messages']){
+    var msgArray = stdOutJSON['messages'];
+    msgArray.forEach(function(message) {
+      arrLines=message.split("\n");
+      arrLines.forEach(function(msg){
+        var line=msg.replace(regex,"/xxxx/xxxx/");
+        resJSON['messages'].push(line);
+      });
+    });
+  }
+  
   return resJSON;
 }
 

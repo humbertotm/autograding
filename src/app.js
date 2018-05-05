@@ -1,4 +1,7 @@
 var buildResJSON = require('./utils/buildResJSON.js');
+var checkIfJSON = require('./utils/checkIfJSON');
+var buildWithNoJson = require('./utils/buildResJSONWithNoJSON.js');
+
 var compilersArr = require('./compilers.js');
 var path = require('path');
 
@@ -23,13 +26,17 @@ app.use(bodyParser());
 
 app.post('/compile', upload.single('codefile'), function(req, res) {
   var langId = parseInt(req.body.langid);
+  if(langId>=compilersArr.length){
+    return res.status(400).send({error:"langid requested is out of range"});
+  }
+  if(req.file==null){
+    return res.status(400).send({error:"File not found in the request"});
+  } 
   var identifier = Math.floor(Math.random() * 1000000);
-
   var langFolder = compilersArr[langId][0];
   var dirToCopy = path.join(__dirname, './usercode/' + langFolder);
   var dest = path.join(__dirname, './code_to_compile/' + identifier);
-
-
+  
   // Create temp directory
   fs.mkdirSync(dest);
 
@@ -43,29 +50,36 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
     var filePath = compilersArr[langId][1];
     // Write codefile to temp dir
     fs.writeFileSync(path.join(dest, filePath + fileName), req.file.buffer);
-
     // Get compiling command
     var compCommand = compilersArr[langId][2];
     // Build statement to be executed
     var compSt = 'cd ' + dest + ' && ' + compCommand;
-
+    
     exec(compSt, function(err, stdOut, stdErr) {
+      var parsedOutputparsedOutput;
+      var resJSON;
       // Remove temp dir
       rimraf.sync(dest);
-
-      if(err) {
-        throw Error(err);
-      } else if(stdErr) {
-        console.log('stdErr: ' + stdErr);
-        // What would be a more appropriate http status?
-        return res.send(200).json({
-          error: stdErr
-        });
-      } else {
-        console.log('stdOut: ' + stdOut);
-        var parsedOutput = JSON.parse(stdOut);
-        var resJSON = buildResJSON(parsedOutput, langId);
-        res.status(200).json(resJSON);
+      try{
+        if(err) {
+          throw Error(err);
+        } else if(stdErr) {
+          console.log('stdErr: ' + stdErr);
+          // What would be a more appropriate http status?
+          return res.send(500).json({
+            error: stdErr
+          });
+        } else {
+            if(checkIfJSON(stdOut)){
+              parsedOutput = JSON.parse(stdOut);
+              resJSON = buildResJSON(parsedOutput, langId);
+              res.status(200).json(resJSON);   
+            }else res.status(400).json((stdOut.length==0)?"Your code cannot be tested, some methods not found":stdOut);  
+        }
+      }
+      catch(e){
+        resJSON= buildWithNoJson(err.stack, langId);
+        return res.status(400).send(resJSON);
       }
     });
   });
