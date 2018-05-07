@@ -25,7 +25,10 @@ var port = 4000;
 app.use(bodyParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.post('/compile', upload.single('codefile'), function(req, res) {
+app.post('/compile', upload.fields([{
+  name: 'codefile', maxCount: 1 }, {
+  name: 'testfile', maxCount: 1
+}]), function(req, res) {
   var langId = parseInt(req.body.langid);
   console.log('Language id: ' + langId);
 
@@ -51,11 +54,21 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
       throw Error(err);
     }
 
-    var fileName = req.file.originalname;
-    console.log('Filename: ' + fileName);
+    var codeFile = req.files['codefile'][0];
+    var codeFileName = codeFile.originalname;
+    console.log('Code filename: ' + codeFileName);
     var filePath = compilersArr[langId][1];
+
+    var testFile = req.files['testfile'][0];
+    var testFileName = testFile.originalname;
+    console.log('Test filename: ' + testFileName);
+    var testFilePath = compilersArr[langId][3];
+
     // Write codefile to temp dir
-    fs.writeFileSync(path.join(dest, filePath + fileName), req.file.buffer);
+    fs.writeFileSync(path.join(dest, filePath + codeFileName), codeFile.buffer);
+    // Write testfile to temp dir
+    fs.writeFileSync(path.join(dest, testFilePath + testFileName), testFile.buffer);
+
     // Get compiling command
     var compCommand = compilersArr[langId][2];
     // Build statement to be executed
