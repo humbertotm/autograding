@@ -23,15 +23,20 @@ var port = 4000;
 
 // app.use(express.static(__dirname));
 app.use(bodyParser());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/compile', upload.single('codefile'), function(req, res) {
   var langId = parseInt(req.body.langid);
+  console.log('Language id: ' + langId);
+
   if(langId>=compilersArr.length){
     return res.status(400).send({error:"langid requested is out of range"});
   }
+
   if(req.file==null){
     return res.status(400).send({error:"File not found in the request"});
   }
+
   var identifier = Math.floor(Math.random() * 1000000);
   var langFolder = compilersArr[langId][0];
   var dirToCopy = path.join(__dirname, './usercode/' + langFolder);
@@ -47,6 +52,7 @@ app.post('/compile', upload.single('codefile'), function(req, res) {
     }
 
     var fileName = req.file.originalname;
+    console.log('Filename: ' + fileName);
     var filePath = compilersArr[langId][1];
     // Write codefile to temp dir
     fs.writeFileSync(path.join(dest, filePath + fileName), req.file.buffer);

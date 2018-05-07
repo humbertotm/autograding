@@ -5,7 +5,7 @@ function extractJsTestResults(testsArr, outcome) {
   var newTestsArr = [];
   testsArr.forEach(function(test) {
     var testTitle = test['title'];
-    var testObj = { [testTitle]: outcome }
+    var testObj = { [testTitle]: testOutcome }
     newTestsArr.push(testObj);
     // outputJSON[testTitle] = testOutcome;
   });
@@ -59,7 +59,7 @@ function rubyJsonResBuilder(stdOutJSON) {
       });
     });
   }
-  
+
   return resJSON;
 }
 
