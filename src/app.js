@@ -36,8 +36,8 @@ app.post('/compile', upload.fields([{
     return res.status(400).send({error:"langid requested is out of range"});
   }
 
-  if(req.file==null){
-    return res.status(400).send({error:"File not found in the request"});
+  if(req.files==null || !(req.files['codefile'] && req.files['testfile'])){
+    return res.status(400).send({error:"Required files are not in the request."});
   }
 
   var identifier = Math.floor(Math.random() * 1000000);
