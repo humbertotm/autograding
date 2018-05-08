@@ -75,6 +75,7 @@ app.post('/compile', upload.fields([{
     // var compCommand = compilersArr[langId][2];
     // Build statement to be executed
     var compSt = 'cd ' + dest + ' && ' + compCommand;
+    console.log(compSt);
 
     exec(compSt, function(err, stdOut, stdErr) {
       var parsedOutputparsedOutput;
@@ -99,7 +100,7 @@ app.post('/compile', upload.fields([{
         }
       }
       catch(e){
-        resJSON= buildWithNoJson(err.stack, langId);
+        resJSON= buildWithNoJson(err, langId);
         return res.status(400).send(resJSON);
       }
     });
