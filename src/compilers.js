@@ -6,8 +6,14 @@ var jsTestFilePath = '/';
 var javaTestFilePath = '/src/test/java/';
 var rubyTestFilePath = '/';
 
+// module.exports = [
+//   ['javascript', jsUserFilePath, 'mocha tests.js --reporter json', jsTestFilePath],
+//   ['java', javaUserFilePath, 'bash create_json_output.sh', javaTestFilePath],
+//   ['ruby', rubyUserFilePath, 'rspec my_model_spec.rb --format j', rubyTestFilePath]
+// ]
+
 module.exports = [
-  ['javascript', jsUserFilePath, 'mocha tests.js --reporter json', jsTestFilePath],
+  ['javascript', jsUserFilePath, 'mocha', '--reporter json' ,jsTestFilePath],
   ['java', javaUserFilePath, 'bash create_json_output.sh', javaTestFilePath],
-  ['ruby', rubyUserFilePath, 'rspec my_model_spec.rb --format j', rubyTestFilePath]
+  ['ruby', rubyUserFilePath, 'rspec', '--format j', rubyTestFilePath]
 ]

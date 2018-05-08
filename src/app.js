@@ -1,6 +1,7 @@
 var buildResJSON = require('./utils/buildResJSON.js');
 var checkIfJSON = require('./utils/checkIfJSON');
 var buildWithNoJson = require('./utils/buildResJSONWithNoJSON.js');
+var generateCompCommand = require('./utils/generateCompCommand.js');
 
 var compilersArr = require('./compilers.js');
 var path = require('path');
@@ -62,7 +63,7 @@ app.post('/compile', upload.fields([{
     var testFile = req.files['testfile'][0];
     var testFileName = testFile.originalname;
     console.log('Test filename: ' + testFileName);
-    var testFilePath = compilersArr[langId][3];
+    var testFilePath = compilersArr[langId][4];
 
     // Write codefile to temp dir
     fs.writeFileSync(path.join(dest, filePath + codeFileName), codeFile.buffer);
@@ -70,7 +71,8 @@ app.post('/compile', upload.fields([{
     fs.writeFileSync(path.join(dest, testFilePath + testFileName), testFile.buffer);
 
     // Get compiling command
-    var compCommand = compilersArr[langId][2];
+    var compCommand = generateCompCommand(langId, testFileName);
+    // var compCommand = compilersArr[langId][2];
     // Build statement to be executed
     var compSt = 'cd ' + dest + ' && ' + compCommand;
 
