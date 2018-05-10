@@ -8,7 +8,7 @@ var path = require('path');
 
 var express = require('express');
 var bodyParser = require('body-parser');
-var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
 var fs = require('fs');
 var ncp = require('ncp');
@@ -34,11 +34,11 @@ app.post('/compile', upload.fields([{
   console.log('Language id: ' + langId);
 
   if(langId>=compilersArr.length){
-    return res.status(400).send({error:"langid requested is out of range"});
+    return res.status(400).json({ error: "No current support for that language." });
   }
 
   if(req.files==null || !(req.files['codefile'] && req.files['testfile'])){
-    return res.status(400).send({error:"Required files are not in the request."});
+    return res.status(400).json({ error: "Required files are not in the request." });
   }
 
   var identifier = Math.floor(Math.random() * 1000000);
@@ -74,37 +74,41 @@ app.post('/compile', upload.fields([{
     var compCommand = generateCompCommand(langId, testFileName);
     // var compCommand = compilersArr[langId][2];
     // Build statement to be executed
-    var compSt = 'cd ' + dest + ' && ' + compCommand + ' ' + '> output.txt && echo Hello >> output.txt && cat output.txt';
+    var compSt = 'cd ' + dest + ' && ' + compCommand;
     console.log(compSt);
 
-    exec(compSt, function(err, stdOut, stdErr) {
-      var parsedOutputparsedOutput;
-      var resJSON;
-      // Remove temp dir
-      rimraf.sync(dest);
-      try{
-        if(err) {
-          throw Error(err);
-        } else if(stdErr) {
-          console.log('stdErr: ' + stdErr);
-          // What would be a more appropriate http status?
-          return res.send(500).json({
-            error: stdErr
-          });
-        } else {
-            if(checkIfJSON(stdOut)){
-              parsedOutput = JSON.parse(stdOut);
-              resJSON = buildResJSON(parsedOutput, langId);
-              res.status(200).json(resJSON);
-            }else res.status(400).json((stdOut.length==0)?"Your code cannot be tested, some methods not found":stdOut);
-        }
-      }
-      catch(e){
-        resJSON= buildWithNoJson(err, langId);
-        console.log('We are in catch statement.')
-        return res.status(400).send(resJSON);
+    var compile = spawn(compSt, {
+      shell: true
+    });
+
+    compile.stdout.on('data', function(data) {
+      var parsedOutput;
+
+      console.log('stdOut: ' + data);
+
+      if(checkIfJSON(data)) {
+        parsedOutput = JSON.parse(data);
+        resJSON = buildResJSON(parsedOutput, langId);
+        res.status(200).json(resJSON);
       }
     });
+
+    compile.stderr.on('data', function(data) {
+      console.log('stdErr: ' + data);
+      res.status(400).json({ error: data });
+    });
+
+    compile.on('close', function(code) {
+      console.log('exit code: ' + code);
+      // Delete temp dir
+      rimraf.sync(dest);
+    });
+
+    compile.on('error', function(err) {
+      console.log('err: ' + err);
+      res.status(500).json({ error: "Failed to compile." });
+    });
+
   });
 });
 
