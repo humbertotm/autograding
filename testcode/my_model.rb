@@ -3,6 +3,6 @@ class MyModel
         return true
     end
     def dos
-        return 1
+        return 2
     end
   end
