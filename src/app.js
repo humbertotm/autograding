@@ -103,7 +103,7 @@ app.post('/compile', upload.fields([{
 
     compile.stdout.on('data', function(data) {
       var parsedOutput;
-      // console.log('stdOut: ' + data);
+      console.log('stdOut: ' + data);
 
       if(checkIfJSON(data)) {
         console.log('Inside json true block');
@@ -115,11 +115,12 @@ app.post('/compile', upload.fields([{
         console.log('Inside not json blocl');
         resToBeSent['error'] = 'Your code could not be compiled.';
         resToBeSent['status'] = 400;
+        }
       }
     });
 
     compile.stderr.on('data', function(data) {
-      // console.log('stdErr: ' + data);
+      console.log('stdErr: ' + data);
 
       resToBeSent['error'] = 'Your code could not be compiled.';
       resToBeSent['status'] = 400;

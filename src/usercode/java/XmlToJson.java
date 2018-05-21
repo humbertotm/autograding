@@ -41,7 +41,7 @@ public class XmlToJson{
             }
             testsJSON += "]}";
 
-            System.out.println(testsJSON);
+            System.out.printf(testsJSON);
             //JSONObject json = new JSONObject(testsJSON);
             //System.out.println(json.toString(3));
         } catch (Exception je) {
@@ -68,4 +68,3 @@ public class XmlToJson{
         return xml;
     }
 }
-

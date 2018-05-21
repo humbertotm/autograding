@@ -30,6 +30,7 @@ function jsJsonResBuilder(stdOutJSON) {
 }
 
 function javaJsonResBuilder(stdOutJSON) {
+  // JSON.parse(stdOutJSON);
   return stdOutJSON;
 }
 
